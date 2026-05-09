@@ -76,39 +76,38 @@
     </a-entity>
   </a-scene>
 
-  <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      const scene = document.querySelector("a-scene");
-      const target = document.querySelector("#target");
-      const video = document.querySelector("#video");
+ <script>
+document.addEventListener("DOMContentLoaded", () => {
 
-      const start = async () => {
-        try {
-          if (video.paused) await video.play();
-        } catch (e) {}
-      };
+  const scene = document.querySelector("a-scene");
+  const video = document.querySelector("#video");
+  const plane = document.querySelector("a-plane");
 
-      const stop = () => {
-        try { video.pause(); } catch (e) {}
-      };
+  let ready = false;
 
-      target.addEventListener("targetFound", () => {
-        target.setAttribute("visible", "true");
-        start();
+  function startVideoSafe() {
+    video.muted = true;
+    video.playsInline = true;
+
+    video.play().then(() => {
+      requestAnimationFrame(() => {
+        ready = true;
       });
+    }).catch(() => {});
+  }
 
-      target.addEventListener("targetLost", () => {
-        target.setAttribute("visible", "false");
-        stop();
-      });
+  scene.addEventListener("arReady", () => {
+    startVideoSafe();
+  });
 
-      scene.addEventListener("arReady", () => {
-        video.load();
-      });
+  // 🔥 critical Android fix: ensure texture updates continuously
+  video.addEventListener("timeupdate", () => {
+    if (plane && ready) {
+      plane.components.material.material.map.needsUpdate = true;
+    }
+  });
 
-      document.body.addEventListener("touchend", start, { once: true });
-      document.body.addEventListener("click", start, { once: true });
-    });
-  </script>
+});
+</script>
 </body>
 </html>
