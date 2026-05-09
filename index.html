@@ -28,27 +28,7 @@
     }
   </style>
 </head>
-<script>
-window.onload = async () => {
 
-  const video = document.querySelector("#video");
-
-  // Force iOS video init
-  video.setAttribute("playsinline", "");
-  video.setAttribute("webkit-playsinline", "");
-  video.muted = true;
-
-  try {
-    await video.play();
-    video.pause();
-    video.currentTime = 0;
-    console.log("Video unlocked");
-  } catch(e) {
-    console.log("Video unlock failed", e);
-  }
-
-};
-</script>
 <body>
 
 <a-scene
@@ -57,7 +37,6 @@ window.onload = async () => {
     autoStart: true;
     uiScanning: true;
     uiLoading: true;
-    showStats: false;
   "
   color-space="sRGB"
   renderer="colorManagement: true; physicallyCorrectLights: true;"
@@ -69,23 +48,11 @@ window.onload = async () => {
 
   <a-assets>
 
-    <!-- IMAGE -->
-    <img
-      id="card"
-      src="https://cdn.jsdelivr.net/gh/hiukim/mind-ar-js@1.2.5/examples/image-tracking/assets/card-example/card.png"
-    />
-
-    <!-- 3D MODEL -->
-    <a-asset-item
-      id="avatarModel"
-      src="https://cdn.jsdelivr.net/gh/hiukim/mind-ar-js@1.2.5/examples/image-tracking/assets/card-example/softmind/scene.gltf"
-    ></a-asset-item>
-
-    <!-- VIDEO -->
     <video
       id="video"
-     src="./video.mp4"
+      src="./video.mp4"
       preload="auto"
+      autoplay
       loop
       muted
       playsinline
@@ -102,39 +69,12 @@ window.onload = async () => {
 
   <a-entity mindar-image-target="targetIndex: 0">
 
-    <!-- IMAGE -->
-    <a-plane
-      src="#card"
-      position="0 0 0"
-      height="0.552"
-      width="1"
-      rotation="0 0 0"
-    ></a-plane>
-
-    <!-- VIDEO OVERLAY -->
     <a-video
       src="#video"
-      position="0 0 0.02"
+      position="0 0 0"
       width="1"
       height="0.552"
-      rotation="0 0 0"
     ></a-video>
-
-    <!-- 3D MODEL -->
-    <a-gltf-model
-      src="#avatarModel"
-      position="0 -0.3 0.1"
-      rotation="0 0 0"
-      scale="0.005 0.005 0.005"
-      animation="
-        property: position;
-        to: 0 -0.2 0.1;
-        dur: 1000;
-        easing: easeInOutQuad;
-        loop: true;
-        dir: alternate;
-      "
-    ></a-gltf-model>
 
   </a-entity>
 
@@ -143,23 +83,25 @@ window.onload = async () => {
 <script>
 document.addEventListener("DOMContentLoaded", () => {
 
-  const video = document.querySelector("#video");
   const sceneEl = document.querySelector("a-scene");
+  const video = document.querySelector("#video");
 
-  // Start video once AR is ready
   sceneEl.addEventListener("arReady", async () => {
+
+    console.log("AR READY");
 
     try {
       await video.play();
       console.log("Video playing");
-    } catch (e) {
-      console.error("Video play failed", e);
+    } catch(err) {
+      console.error(err);
     }
 
   });
 
-  sceneEl.addEventListener("arError", () => {
-    alert("AR failed to start");
+  sceneEl.addEventListener("arError", (err) => {
+    console.error("AR ERROR", err);
+    alert("AR failed");
   });
 
 });
