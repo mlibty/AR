@@ -2,9 +2,9 @@
 <html>
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
 
   <style>
     html, body {
@@ -98,6 +98,10 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // 🔥 critical Android fix: ensure texture updates continuously
+  video.addEventListener("loadeddata", () => {
+  video.currentTime = 0.1;
+  video.pause();
+});
   video.addEventListener("timeupdate", () => {
     if (plane && ready) {
       plane.components.material.material.map.needsUpdate = true;
