@@ -69,13 +69,14 @@ webkit-playsinline
 
 <a-video
 src="#video"
-position="0 0 -0.01"
+position="0 0 0.01"
 width="1"
 height="1"
 material="
 shader: flat;
 transparent: false;
-
+depthTest: false;
+depthWrite: false;
 "
 render-order="1"
 ></a-video>
