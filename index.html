@@ -40,26 +40,18 @@
   mindar-image="
     imageTargetSrc: ./targets.mind;
     autoStart: true;
-    maxTrack: 1;
-    filterMinCF: 0.005;
-    filterBeta: 0.002;
+    filterMinCF: 0.0001;
+    filterBeta: 0.001;
     warmupTolerance: 5;
     missTolerance: 5;
   "
   embedded
   vr-mode-ui="enabled: false"
   device-orientation-permission-ui="enabled: false"
-  renderer="
-    alpha: true;
-    antialias: false;
-    precision: mediump;
-    physicallyCorrectLights: false;
-  "
->
+  renderer="alpha: true; antialias: false; precision: mediump; sortObjects: true;"
 >
 
   <a-assets>
-
     <video
       id="video"
       src="./video.mp4"
@@ -69,19 +61,18 @@
       playsinline
       webkit-playsinline
     ></video>
-
   </a-assets>
 
   <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
 
   <a-entity mindar-image-target="targetIndex: 0">
 
-    <!-- VIDEO -->
     <a-video
       src="#video"
-      position="0 0 0.02"
-      width="0.886"
-      height="1.0"
+      position="0 0 -0.01"
+      width="1"
+      height="1"
+      material="transparent: true; alphaTest: 0.5; depthTest: false;"
     ></a-video>
 
   </a-entity>
