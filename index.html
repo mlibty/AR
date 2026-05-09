@@ -28,7 +28,27 @@
     }
   </style>
 </head>
+<script>
+window.onload = async () => {
 
+  const video = document.querySelector("#video");
+
+  // Force iOS video init
+  video.setAttribute("playsinline", "");
+  video.setAttribute("webkit-playsinline", "");
+  video.muted = true;
+
+  try {
+    await video.play();
+    video.pause();
+    video.currentTime = 0;
+    console.log("Video unlocked");
+  } catch(e) {
+    console.log("Video unlock failed", e);
+  }
+
+};
+</script>
 <body>
 
 <a-scene
@@ -43,6 +63,7 @@
   renderer="colorManagement: true; physicallyCorrectLights: true;"
   vr-mode-ui="enabled: false"
   device-orientation-permission-ui="enabled: false"
+  loading-screen="enabled: false"
   embedded
 >
 
@@ -63,7 +84,7 @@
     <!-- VIDEO -->
     <video
       id="video"
-      src="https://superrare-artworks.imgix.net/asset/194b5f15d851181f85f9154783260486c02854c4806e890d34d01aa6e06801c0.mp4?ixlib=js-3.8.0&auto=format&quality=100&dpr=2&cs=origin&s=e1b0ac1bd8b827c13843843d59a4dc27"
+     src="./video.mp4"
       preload="auto"
       loop
       muted
