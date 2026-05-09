@@ -37,7 +37,12 @@
     embedded
     vr-mode-ui="enabled: false"
     device-orientation-permission-ui="enabled: false"
-    renderer="alpha: true; antialias: true; precision: highp; colorManagement: true; physicallyCorrectLights: false; sortObjects: true;"
+    renderer="
+  alpha: true;
+  antialias: false;
+  precision: mediump;
+  logarithmicDepthBuffer: false;
+"
   >
     <a-assets>
       <video
@@ -54,15 +59,20 @@
 
     <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
 
-    <a-entity id="target" mindar-image-target="targetIndex: 0" visible="false">
+    <a-entity id="target" mindar-image-target="targetIndex: 0">
       <a-plane
-        id="videoPlane"
-        src="#video"
-        position="0 0 0.001"
-        width="1.0"
-        height="0.5625"
-        material="shader: flat; side: double; transparent: true; depthTest: false; depthWrite: false; alphaTest: 0.01; toneMapped: false;"
-      ></a-plane>
+  src="#video"
+  position="0 0 0"
+  width="0.5625"
+  height="1.0"
+  material="
+    shader: flat;
+    transparent: false;
+    depthTest: true;
+    depthWrite: false;
+    side: front;
+  "
+></a-plane>
     </a-entity>
   </a-scene>
 
