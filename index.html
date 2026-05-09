@@ -38,13 +38,16 @@
 
 <a-scene
   mindar-image="imageTargetSrc: ./targets.mind; autoStart: true;"
+  filterMinCF: 0.0001;
+  filterBeta: 0.01;
   embedded
   vr-mode-ui="enabled: false"
   device-orientation-permission-ui="enabled: false"
   renderer="
     alpha: true;
-    antialias: true;
+    antialias: false;
     colorManagement: true;
+    precision: mediump;
     physicallyCorrectLights: false;
   "
 >
