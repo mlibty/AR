@@ -32,87 +32,96 @@
 </head>
 <body>
   <a-scene
-    mindar-image="imageTargetSrc: ./targets.mind;  autoStart: true;
-      filterMinCF: 1;
-      filterBeta: 500;
-      warmupTolerance: 1;
-      missTolerance: 5;"
+    mindar-image="imageTargetSrc: ./targets.mind; autoStart: true; filterMinCF: 1; filterBeta: 500; warmupTolerance: 1; missTolerance: 5;"
     embedded
     vr-mode-ui="enabled: false"
     device-orientation-permission-ui="enabled: false"
-    renderer="
-  alpha: true;
-  antialias: false;
-  precision: mediump;
-  logarithmicDepthBuffer: false;
-"
+    renderer="alpha: true; antialias: false; precision: mediump; logarithmicDepthBuffer: false;"
   >
     <a-assets>
       <video
-  id="video"
-  src="./video.mp4"
-  preload="auto"
-  muted
-  playsinline
-  webkit-playsinline
-  crossorigin="anonymous"
-></video>
+        id="video"
+        src="./video.mp4"
+        preload="auto"
+        muted
+        autoplay
+        loop
+        playsinline
+        webkit-playsinline
+        x-webkit-airplay="allow"
+        crossorigin="anonymous"
+        poster="./poster.jpg"
+      ></video>
     </a-assets>
 
     <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
 
     <a-entity id="target" mindar-image-target="targetIndex: 0">
       <a-plane
-  src="#video"
-  position="0 0 0.1"
-  width="0.9"
-  height="1.0"
-  material="
-  shader: flat;
-  transparent: false;
-  depthTest: false;
-  depthWrite: false;
-"
-></a-plane>
+        id="videoPlane"
+        src="#video"
+        position="0 0 0.1"
+        width="0.9"
+        height="1.0"
+        material="shader: flat; transparent: false; depthTest: false; depthWrite: false; side: double; toneMapped: false;"
+      ></a-plane>
     </a-entity>
   </a-scene>
 
- <script>
-document.addEventListener("DOMContentLoaded", () => {
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const scene = document.querySelector("a-scene");
+      const video = document.querySelector("#video");
+      const plane = document.querySelector("#videoPlane");
+      const target = document.querySelector("#target");
 
-  const scene = document.querySelector("a-scene");
-  const video = document.querySelector("#video");
-  const plane = document.querySelector("a-plane");
+      let ready = false;
+      let started = false;
 
-  let ready = false;
+      function playVideo() {
+        if (started) return;
+        started = true;
+        video.muted = true;
+        video.setAttribute("muted", "");
+        video.setAttribute("autoplay", "");
+        video.setAttribute("playsinline", "");
+        video.setAttribute("webkit-playsinline", "");
+        video.load();
+        video.play().then(() => {
+          ready = true;
+        }).catch(() => {});
+      }
 
-  function startVideoSafe() {
-    video.muted = true;
-    video.playsInline = true;
+      function stopVideo() {
+        started = false;
+        ready = false;
+        video.pause();
+      }
 
-    video.play().then(() => {
-      requestAnimationFrame(() => {
-        ready = true;
+      scene.addEventListener("arReady", () => {
+        playVideo();
       });
-    }).catch(() => {});
-  }
 
-  scene.addEventListener("arReady", () => {
-    startVideoSafe();
-  });
+      target.addEventListener("targetFound", () => {
+        target.setAttribute("visible", "true");
+        playVideo();
+      });
 
-  // 🔥 critical Android fix: ensure texture updates continuously
-  video.addEventListener("loadeddata", () => {
-  video.currentTime = 0.1;
-  video.pause();
-});
-  video.addEventListener("timeupdate", () => {
-    if (plane && ready) {
-      plane.components.material.material.map.needsUpdate = true;
-    }
-  });
+      target.addEventListener("targetLost", () => {
+        target.setAttribute("visible", "false");
+        stopVideo();
+      });
 
-});
-</script>
+      video.addEventListener("loadeddata", () => {
+        video.currentTime = 0.01;
+      });
+
+      video.addEventListener("timeupdate", () => {
+        if (plane && ready && plane.components && plane.components.material && plane.components.material.material && plane.components.material.material.map) {
+          plane.components.material.material.map.needsUpdate = true;
+        }
+      });
+    });
+  </script>
 </body>
 </html>
