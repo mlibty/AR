@@ -32,7 +32,7 @@
 </head>
 <body>
   <a-scene
-    mindar-image="imageTargetSrc: ./targets.mind; autoStart: true; filterMinCF: 1; filterBeta: 500; warmupTolerance: 5; missTolerance: 5;"
+    mindar-image="imageTargetSrc: ./targets.mind; autoStart: true; filterMinCF: 0.0001; filterBeta: 0.001; warmupTolerance: 5; missTolerance: 5;"
     embedded
     vr-mode-ui="enabled: false"
     device-orientation-permission-ui="enabled: false"
@@ -63,7 +63,14 @@
         position="0 0 0.05"
         width="1"
         height="1"
-        material="shader: flat; transparent: false; depthTest: false; depthWrite: false; side: double; toneMapped: false;"
+        material="
+  shader: flat;
+  transparent: false;
+  depthTest: true;
+  depthWrite: false;
+  side: front;
+  toneMapped: false;
+"
       ></a-plane>
     </a-entity>
   </a-scene>
