@@ -7,43 +7,28 @@
   <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
 
   <style>
-  html, body {
-    margin: 0;
-    padding: 0;
-    overflow: hidden;
-    width: 100%;
-    height: 100%;
-    background: transparent;
-  }
+    html, body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      width: 100%;
+      height: 100%;
+      background: transparent;
+    }
 
-  a-scene {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 1;
-  }
+    a-scene {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+    }
 
-  canvas {
-    width: 100% !important;
-    height: 100% !important;
-    display: block;
-  }
-
-  #overlayVideo {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    width: 100vw;
-    height: 100vh;
-    transform: translate(-50%, -50%);
-    object-fit: contain;
-    background: transparent;
-    display: none;
-    z-index: 2;
-    pointer-events: none;
-  }
-</style>
+    canvas {
+      width: 100% !important;
+      height: 100% !important;
+      display: block;
+    }
+  </style>
 </head>
 <body>
   <a-scene
@@ -51,84 +36,87 @@
     embedded
     vr-mode-ui="enabled: false"
     device-orientation-permission-ui="enabled: false"
-    renderer="
-  alpha: true;
-  antialias: false;
-  precision: mediump;
-"
+    renderer="alpha: true; antialias: false; precision: mediump;"
   >
     <a-assets>
       <video
-  id="video"
-  src="./video.mp4"
-  muted
-  loop
-  playsinline
-  webkit-playsinline
-  preload="auto"
-  crossorigin="anonymous"
-></video>
+        id="video"
+        src="./video.mp4"
+        muted
+        loop
+        autoplay
+        playsinline
+        webkit-playsinline
+        preload="auto"
+        crossorigin="anonymous"
+        poster="./poster.jpg"
+      ></video>
     </a-assets>
 
     <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
 
     <a-entity id="target" mindar-image-target="targetIndex: 0">
-     <video
-  id="overlayVideo"
-  src="./video.mp4"
-  muted
-  loop
-  autoplay
-  playsinline
-  webkit-playsinline
-  preload="auto"
-  poster="./poster.jpg"
-></video>
+      <a-plane
+        id="videoPlane"
+        src="#video"
+        position="0 0 0.001"
+        width="1"
+        height="1"
+        material="shader: flat; transparent: false; side: double; depthTest: false; depthWrite: false; toneMapped: false;"
+      ></a-plane>
     </a-entity>
   </a-scene>
 
   <script>
-document.addEventListener("DOMContentLoaded", () => {
-  const video = document.querySelector("#overlayVideo");
-  const target = document.querySelector("#target");
-  let unlocked = false;
-  let playing = false;
+    document.addEventListener("DOMContentLoaded", () => {
+      const scene = document.querySelector("a-scene");
+      const video = document.querySelector("#video");
+      const target = document.querySelector("#target");
 
-  async function unlockVideo() {
-    if (unlocked) return;
-    unlocked = true;
-    try {
-      video.load();
-      await video.play();
-      video.pause();
-      video.currentTime = 0;
-    } catch (e) {}
-  }
+      let unlocked = false;
 
-  async function startVideo() {
-    if (playing) return;
-    try {
-      video.style.display = "block";
-      video.load();
-      await video.play();
-      playing = true;
-    } catch (e) {
-      console.log(e);
-    }
-  }
+      async function unlockVideo() {
+        if (unlocked) return;
+        unlocked = true;
+        try {
+          video.load();
+          await video.play();
+          video.pause();
+          video.currentTime = 0;
+        } catch (e) {}
+      }
 
-  function stopVideo() {
-    playing = false;
-    video.pause();
-    video.style.display = "none";
-  }
+      async function startVideo() {
+        try {
+          video.style.display = "block";
+          video.load();
+          await video.play();
+        } catch (e) {}
+      }
 
-  target.addEventListener("targetFound", startVideo);
-  target.addEventListener("targetLost", stopVideo);
+      function stopVideo() {
+        try {
+          video.pause();
+        } catch (e) {}
+      }
 
-  document.body.addEventListener("touchend", unlockVideo, { once: true });
-  document.body.addEventListener("click", unlockVideo, { once: true });
-});
-</script>
+      scene.addEventListener("arReady", () => {
+        unlockVideo();
+      });
+
+      target.addEventListener("targetFound", () => {
+        target.setAttribute("visible", "true");
+        startVideo();
+      });
+
+      target.addEventListener("targetLost", () => {
+        target.setAttribute("visible", "false");
+        stopVideo();
+      });
+
+      document.body.addEventListener("touchend", unlockVideo, { once: true });
+      document.body.addEventListener("click", unlockVideo, { once: true });
+    });
+  </script>
 </body>
 </html>
