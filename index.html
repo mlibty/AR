@@ -124,11 +124,7 @@ disableremoteplayback
         video.currentTime = 0.01;
       });
 
-      video.addEventListener("timeupdate", () => {
-        if (plane && ready && plane.components && plane.components.material && plane.components.material.material && plane.components.material.material.map) {
-          plane.components.material.material.map.needsUpdate = true;
-        }
-      });
+      
     });
   </script>
 </body>
