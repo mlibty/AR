@@ -36,34 +36,42 @@
     embedded
     vr-mode-ui="enabled: false"
     device-orientation-permission-ui="enabled: false"
-    renderer="alpha: true; antialias: false; precision: mediump;"
+    renderer="
+  alpha: true;
+  antialias: false;
+  precision: mediump;
+"
   >
     <a-assets>
       <video
-        id="video"
-        src="./video.mp4"
-        muted
-        loop
-        autoplay
-        playsinline
-        webkit-playsinline
-        preload="auto"
-        crossorigin="anonymous"
-        poster="./poster.jpg"
-      ></video>
+  id="video"
+  src="./video.mp4"
+  muted
+  loop
+  playsinline
+  webkit-playsinline
+  preload="auto"
+  crossorigin="anonymous"
+></video>
     </a-assets>
 
     <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
 
     <a-entity id="target" mindar-image-target="targetIndex: 0">
-      <a-plane
-        id="videoPlane"
-        src="#video"
-        position="0 0 0.001"
-        width="1"
-        height="1"
-        material="shader: flat; transparent: false; side: double; depthTest: false; depthWrite: false; toneMapped: false;"
-      ></a-plane>
+      <a-video
+  id="videoPlane"
+  src="#video"
+  position="0 0 0"
+  width="1"
+  height="1"
+  material="
+    shader: flat;
+    transparent: false;
+    side: front;
+    depthTest: true;
+    depthWrite: false;
+  "
+></a-video>
     </a-entity>
   </a-scene>
 
@@ -71,42 +79,39 @@
     document.addEventListener("DOMContentLoaded", () => {
       const scene = document.querySelector("a-scene");
       const video = document.querySelector("#video");
+      const plane = document.querySelector("#videoPlane");
       const target = document.querySelector("#target");
 
-      let unlocked = false;
+      let ready = false;
+      let started = false;
 
-      async function unlockVideo() {
-        if (unlocked) return;
-        unlocked = true;
-        try {
-          video.load();
-          await video.play();
-          video.pause();
-          video.currentTime = 0;
-        } catch (e) {}
-      }
-
-      async function startVideo() {
-        try {
-          video.style.display = "block";
-          video.load();
-          await video.play();
-        } catch (e) {}
+      function playVideo() {
+        if (started) return;
+        started = true;
+        video.muted = true;
+        video.setAttribute("muted", "");
+        video.setAttribute("autoplay", "");
+        video.setAttribute("playsinline", "");
+        video.setAttribute("webkit-playsinline", "");
+        video.load();
+        video.play().then(() => {
+          ready = true;
+        }).catch(() => {});
       }
 
       function stopVideo() {
-        try {
-          video.pause();
-        } catch (e) {}
+        started = false;
+        ready = false;
+        video.pause();
       }
 
       scene.addEventListener("arReady", () => {
-        unlockVideo();
+        playVideo();
       });
 
       target.addEventListener("targetFound", () => {
         target.setAttribute("visible", "true");
-        startVideo();
+        playVideo();
       });
 
       target.addEventListener("targetLost", () => {
@@ -114,8 +119,9 @@
         stopVideo();
       });
 
-      document.body.addEventListener("touchend", unlockVideo, { once: true });
-      document.body.addEventListener("click", unlockVideo, { once: true });
+      
+
+      
     });
   </script>
 </body>
