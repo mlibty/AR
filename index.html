@@ -2,7 +2,6 @@
 <html>
 <head>
   <meta charset="UTF-8" />
-
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
@@ -28,79 +27,57 @@
     canvas {
       width: 100% !important;
       height: 100% !important;
+      display: block;
     }
   </style>
 </head>
 
 <body>
+  <a-scene
+    mindar-image="imageTargetSrc: ./targets.mind; autoStart: true; filterMinCF: 0.0001; filterBeta: 0.001; warmupTolerance: 5; missTolerance: 5;"
+    embedded
+    vr-mode-ui="enabled: false"
+    device-orientation-permission-ui="enabled: false"
+    renderer="alpha: true; antialias: true; colorManagement: true; physicallyCorrectLights: false;"
+  >
+    <a-assets>
+      <video
+        id="video"
+        src="./video.mp4"
+        preload="auto"
+        loop
+        muted
+        playsinline
+        webkit-playsinline
+      ></video>
+    </a-assets>
 
-<a-scene
-  mindar-image="imageTargetSrc: ./targets.mind; autoStart: true; filterMinCF: 0.0001; filterBeta: 0.001; warmupTolerance: 5; missTolerance: 5;"
-  embedded
-  vr-mode-ui="enabled: false"
-  device-orientation-permission-ui="enabled: false"
-  renderer="
-    alpha: true;
-    antialias: true;
-    colorManagement: true;
-    physicallyCorrectLights: false;
-  "
->
+    <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
 
-  <a-assets>
+    <a-entity mindar-image-target="targetIndex: 0">
+      <a-video
+        src="#video"
+        position="0 0 -0.01"
+        width="1"
+        height="1"
+        material="shader: flat; transparent: false; side: front; depthTest: true; depthWrite: false;"
+      ></a-video>
+    </a-entity>
+  </a-scene>
 
-    <video
-      id="video"
-      src="./video.mp4"
-      preload="auto"
-      loop
-      muted
-      playsinline
-      webkit-playsinline
-    ></video>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const scene = document.querySelector("a-scene");
+      const video = document.querySelector("#video");
 
-  </a-assets>
-
-  <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
-
-  <a-entity mindar-image-target="targetIndex: 0">
-
-    <!-- VIDEO -->
-    <a-video
-      src="#video"
-      position="0 0 -0.01"
-      width="1"
-      height="1"
-      material="shader: flat; transparent: false; side: front; depthTest: true; depthWrite: false;
-    ></a-video>
-
-  </a-entity>
-
-</a-scene>
-
-<script>
-document.addEventListener("DOMContentLoaded", () => {
-
-  const scene = document.querySelector("a-scene");
-  const video = document.querySelector("#video");
-
-  // IMPORTANT: iOS + Android sync start
-  scene.addEventListener("arReady", async () => {
-
-    try {
-      await video.play();
-    } catch (e) {
-      console.log("Video blocked:", e);
-    }
-
-  });
-
-  scene.addEventListener("renderstart", () => {
-    console.log("Render started");
-  });
-
-});
-</script>
-
+      scene.addEventListener("arReady", async () => {
+        try {
+          await video.play();
+        } catch (e) {
+          console.log("Video blocked:", e);
+        }
+      });
+    });
+  </script>
 </body>
 </html>
